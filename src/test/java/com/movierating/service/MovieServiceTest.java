@@ -38,3 +38,4 @@ class MovieServiceTest {
         assertEquals("Inception", result.get(0).getTitle());
     }
 }
+
