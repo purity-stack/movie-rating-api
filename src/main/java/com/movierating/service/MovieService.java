@@ -1,52 +1,41 @@
 package com.movierating.service;
-	import java.util.List;
+import com.movierating.Movie;
+import com.movierating.exception.MovieNotFoundException;
+import org.springframework.stereotype.Service;
+import java.util.*;
 
-	import org.springframework.stereotype.Service;
+@Service
+public class MovieService {
 
-	import com.movierating.Movie;
-	import com.movierating.MovieRepository;
+    private final Map<Long, Movie> movieMap = new HashMap<>();
+    private Long nextId = 1L;
 
-	@Service
-	public class MovieService {
+    public Movie addMovie(Movie movie) {
+        movie.setId(nextId++);
+        movieMap.put(movie.getId(), movie);
+        return movie;
+    }
 
-	    private final MovieRepository movieRepository;
+    public Movie updateMovie(Long id, Movie movie) {
+        Movie existing = movieMap.get(id);
+        if (existing == null) throw new MovieNotFoundException("Movie not found with ID " + id);
+        existing.setTitle(movie.getTitle());
+        existing.setRating(movie.getRating());
+        return existing;
+    }
 
-	    public MovieService(MovieRepository movieRepository) {
-	        this.movieRepository = movieRepository;
-	    }
+    public Movie getMovieById(Long id) {
+        Movie movie = movieMap.get(id);
+        if (movie == null) throw new MovieNotFoundException("Movie not found with ID " + id);
+        return movie;
+    }
 
-	    // Get all movies
-	    public List<Movie> getAllMovies() {
-	        return movieRepository.findAll();
-	    }
+    public List<Movie> getAllMovies() {
+        return new ArrayList<>(movieMap.values());
+    }
 
-	    // Get a movie by ID
-	    public Movie getMovieById(Long id) {
-	        return movieRepository.findById(id).orElse(null);
-	    }
-
-	    // Save a new movie
-	    public Movie saveMovie(Movie movie) {
-	        return movieRepository.save(movie);
-	    }
-
-	    // Update an existing movie
-	    public Movie updateMovie(Long id, Movie updatedMovie) {
-	        return movieRepository.findById(id).map(movie -> {
-	            movie.setTitle(updatedMovie.getTitle());
-	            movie.setRating(updatedMovie.getRating());
-	            return movieRepository.save(movie);
-	        }).orElse(null);
-	    }
-
-	    // Delete a movie by ID
-	    public boolean deleteMovie(Long id) {
-	        if (movieRepository.existsById(id)) {
-	            movieRepository.deleteById(id);
-	            return true;
-	        }
-	        return false;
-	    }
-	}
-
-
+    public void deleteMovie(Long id) {
+        if (!movieMap.containsKey(id)) throw new MovieNotFoundException("Movie not found with ID " + id);
+        movieMap.remove(id);
+    }
+}

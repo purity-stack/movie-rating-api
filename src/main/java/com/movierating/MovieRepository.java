@@ -1,6 +1,20 @@
 package com.movierating;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.movierating.Movie;
+import org.springframework.stereotype.Repository;
 
-public interface MovieRepository extends JpaRepository<Movie, Long> {
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface MovieRepository {
+    // These methods match what your in-memory MovieService is doing
+
+    Movie save(Movie movie);
+
+    Optional<Movie> findById(Long id);
+
+    List<Movie> findAll();
+
+    void deleteById(Long id);
 }

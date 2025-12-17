@@ -1,18 +1,25 @@
 package com.movierating;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
-@Entity
 public class Movie {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title cannot be empty")
     private String title;
+
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 10, message = "Rating cannot be more than 10")
     private int rating;
 
+    // Constructors, getters, and setters
     public Movie() {}
+
+    public Movie(Long id, String title, int rating) {
+        this.id = id;
+        this.title = title;
+        this.rating = rating;
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

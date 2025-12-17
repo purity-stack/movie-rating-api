@@ -1,10 +1,13 @@
-package com.movierating;
+package com.movierating; 
 
-import java.util.List;
-
+import com.movierating.Movie;
+import com.movierating.service.MovieService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.movierating.service.MovieService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/movies")
@@ -16,34 +19,36 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    // GET all movies
-    @GetMapping
-    public List<Movie> getAllMovies() {
-        return movieService.getAllMovies();
-    }
-
-    // GET movie by ID
-    @GetMapping("/{id}")
-    public Movie getMovieById(@PathVariable Long id) {
-        return movieService.getMovieById(id);
-    }
-
-    // POST a new movie
+    // Add a movie
     @PostMapping
-    public Movie addMovie(@RequestBody Movie movie) {
-        return movieService.saveMovie(movie);
+    public ResponseEntity<Movie> addMovie(@Valid @RequestBody Movie movie) {
+        Movie savedMovie = movieService.addMovie(movie);
+        return new ResponseEntity<>(savedMovie, HttpStatus.CREATED);
     }
 
-    // PUT update a movie
+    // Get all movies
+    @GetMapping
+    public ResponseEntity<List<Movie>> getAllMovies() {
+        return ResponseEntity.ok(movieService.getAllMovies());
+    }
+
+    // Get movie by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
+        return ResponseEntity.ok(movieService.getMovieById(id));
+    }
+
+    // Update movie
     @PutMapping("/{id}")
-    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
-        return movieService.updateMovie(id, movie);
+    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @Valid @RequestBody Movie movie) {
+        Movie updated = movieService.updateMovie(id, movie);
+        return ResponseEntity.ok(updated);
     }
 
-    // DELETE movie
+    // Delete movie
     @DeleteMapping("/{id}")
-    public String deleteMovie(@PathVariable Long id) {
-        boolean deleted = movieService.deleteMovie(id);
-        return deleted ? "Movie deleted successfully" : "Movie not found";
+    public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+        movieService.deleteMovie(id);
+        return ResponseEntity.noContent().build();
     }
 }
